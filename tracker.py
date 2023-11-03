@@ -29,6 +29,10 @@ def resizeImage(img, newWidth, newHeight):
     newPhotoImage = ImageTk.PhotoImage(newImg)
     return newPhotoImage
 
+#load data from json
+with open(fileSrc('data.json')) as file:
+    drop = json.load(file)
+
 root = tk.Tk()
 root.title("Drop Tracker")
 root.iconphoto(True, PhotoImage(file=imgSrc("peek.png")))
@@ -43,8 +47,9 @@ def callBack(input):
         return False
 vcmd = root.register(callBack)
 
+theme = StringVar(value=drop['settings']['theme'])
 style = ThemedStyle(root)
-style.set_theme("black")
+style.set_theme(theme.get())
 
 #tab definition
 tabControl = ttk.Notebook(root)
@@ -52,15 +57,20 @@ tabControl = ttk.Notebook(root)
 barTab = ttk.Frame(tabControl)
 sandTab = ttk.Frame(tabControl)
 customTab = ttk.Frame(tabControl)
+settingsTab = ttk.Frame(tabControl)
+
 tabControlSand = ttk.Notebook(sandTab)
 tabControlBar = ttk.Notebook(barTab)
 tabControlCustom = ttk.Notebook(customTab)
+tabControlSettings = ttk.Notebook(settingsTab)
+
 pbhlTab = ttk.Frame(tabControlBar)
 akashaTab = ttk.Frame(tabControlBar)
 gohlTab = ttk.Frame(tabControlBar)
 dragonTab = ttk.Frame(tabControlSand)
 revansTab = ttk.Frame(tabControlSand)
 subhlTab = ttk.Frame(tabControlSand)
+
 custom1Tab = ttk.Frame(tabControlCustom)
 custom2Tab = ttk.Frame(tabControlCustom)
 custom3Tab = ttk.Frame(tabControlCustom)
@@ -69,9 +79,11 @@ custom4Tab = ttk.Frame(tabControlCustom)
 tabControlBar.add(pbhlTab, text='PBHL')
 tabControlBar.add(akashaTab, text='Akasha')
 tabControlBar.add(gohlTab, text='GOHL')
+
 tabControlSand.add(dragonTab, text='Dragons')
 tabControlSand.add(revansTab, text='Revans')
 tabControlSand.add(subhlTab, text='SUBHL')
+
 tabControlCustom.add(custom1Tab, text='Custom 1')
 tabControlCustom.add(custom2Tab, text='Custom 2')
 tabControlCustom.add(custom3Tab, text='Custom 3')
@@ -84,14 +96,11 @@ customImg = ImageTk.PhotoImage((Image.open(imgSrc("custom.png"))).resize((20,20)
 tabControl.add(barTab, text="Gold Bar", image=barImg, compound="left")
 tabControl.add(sandTab, text='Eternity Sand', image=sandImg, compound="left")
 tabControl.add(customTab, text='Custom', image=customImg, compound="left")
+tabControl.add(settingsTab, text='Settings', image=customImg, compound="left")
 tabControl.pack(expand=1, fill="both")
 tabControlBar.pack(expand=1, fill="both")
 tabControlSand.pack(expand=1, fill="both")
 tabControlCustom.pack(expand=1, fill="both")
-
-#load data from json
-with open(fileSrc('data.json')) as file:
-    drop = json.load(file)
 
 # counter var def
 
@@ -309,7 +318,9 @@ def saveData():
         'resourceTab':  tabControl.select(),
         'goldTab':  tabControlBar.select(),
         'sandTab':  tabControlSand.select(),
-        'customTab':  tabControlCustom.select()
+        'customTab':  tabControlCustom.select(),
+        'settingsTab':  tabControlSettings.select(),
+        'theme': theme.get()
     }
     drop['pbhl'] = {
         'raid': pbhlraidCount.get(),
@@ -1290,6 +1301,11 @@ def custom4resetCount():
         return
     saveData()
 
+def themeSetting(themeColor):
+    theme.set(themeColor)
+    style.set_theme(theme.get())
+    saveData()
+
 # GUI Layout / render
 
 # total pbhl raids
@@ -1731,7 +1747,7 @@ subhlAnimaTextAfter.insert(0, drop['subhl']['animaafter'])
 subhlAnimaTextAfter.bind("<KeyRelease>", subhlAnimaDifference)
 
 # total custom1 raids
-custom1CountImg = tk.PhotoImage(file=imgSrc("custom1Count.png", raid="custom1"))
+custom1CountImg = tk.PhotoImage(file=imgSrc("custom1count.png", raid="custom1"))
 custom1CountImg = resizeImage(custom1CountImg, 50, 50)
 custom1CountLabel = ttk.Label(custom1Tab, image=custom1CountImg).grid(column=0,row=1)
 custom1CounterLabel = ttk.Label(custom1Tab, textvariable=custom1raidCount).grid(column=0, row=2)
@@ -1835,7 +1851,7 @@ custom1TextAfter.insert(0, drop['custom1']['animaafter'])
 custom1TextAfter.bind("<KeyRelease>", custom1MatsDifference)
 
 # total custom2 raids
-custom2CountImg = tk.PhotoImage(file=imgSrc("custom2Count.png", raid="custom2"))
+custom2CountImg = tk.PhotoImage(file=imgSrc("custom2count.png", raid="custom2"))
 custom2CountImg = resizeImage(custom2CountImg, 50, 50)
 custom2CountLabel = ttk.Label(custom2Tab, image=custom2CountImg).grid(column=0,row=1)
 custom2CounterLabel = ttk.Label(custom2Tab, textvariable=custom2raidCount).grid(column=0, row=2)
@@ -1939,7 +1955,7 @@ custom2TextAfter.insert(0, drop['custom2']['animaafter'])
 custom2TextAfter.bind("<KeyRelease>", custom2MatsDifference)
 
 # total custom3 raids
-custom3CountImg = tk.PhotoImage(file=imgSrc("custom3Count.png", raid="custom3"))
+custom3CountImg = tk.PhotoImage(file=imgSrc("custom3count.png", raid="custom3"))
 custom3CountImg = resizeImage(custom3CountImg, 50, 50)
 custom3CountLabel = ttk.Label(custom3Tab, image=custom3CountImg).grid(column=0,row=1)
 custom3CounterLabel = ttk.Label(custom3Tab, textvariable=custom3raidCount).grid(column=0, row=2)
@@ -2043,7 +2059,7 @@ custom3TextAfter.insert(0, drop['custom3']['animaafter'])
 custom3TextAfter.bind("<KeyRelease>", custom3MatsDifference)
 
 # total custom4 raids
-custom4CountImg = tk.PhotoImage(file=imgSrc("custom4Count.png", raid="custom4"))
+custom4CountImg = tk.PhotoImage(file=imgSrc("custom4count.png", raid="custom4"))
 custom4CountImg = resizeImage(custom4CountImg, 50, 50)
 custom4CountLabel = ttk.Label(custom4Tab, image=custom4CountImg).grid(column=0,row=1)
 custom4CounterLabel = ttk.Label(custom4Tab, textvariable=custom4raidCount).grid(column=0, row=2)
@@ -2294,6 +2310,22 @@ azuriteTextAfter = ttk.Entry(gohlTab, width=12, validate='key', validatecommand=
 azuriteTextAfter.grid(column=1, columnspan=2, row=5)
 azuriteTextAfter.insert(0, drop['gohl']['azuriteafter'])
 azuriteTextAfter.bind("<KeyRelease>", azuriteDifference)
+
+# settings tab
+themeString = StringVar(value="Theme")
+themeStringLight = StringVar(value="Light Theme")
+themeStringDark = StringVar(value="Dark Theme")
+
+settingsThemeTitle = ttk.Label(settingsTab, textvariable=themeString, justify="left")
+settingsThemeTitle.grid(column=0, columnspan=2, row=5, sticky= tk.NW)
+
+settingsThemeLightButton = ttk.Button(settingsTab, textvariable=themeStringLight)
+settingsThemeLightButton.bind('<Button-1>', lambda event: themeSetting("arc"))
+settingsThemeLightButton.grid(column=0, columnspan=2, row=6, sticky= tk.NW)
+
+settingsThemeLightButton = ttk.Button(settingsTab, textvariable=themeStringDark)
+settingsThemeLightButton.bind('<Button-1>', lambda event: themeSetting("black"))
+settingsThemeLightButton.grid(column=3, columnspan=2, row=6, sticky= tk.NW)
 
 tabControl.select(drop["settings"]["resourceTab"])
 if drop["settings"]["resourceTab"] == ".!notebook.!frame":

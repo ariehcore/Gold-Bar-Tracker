@@ -1,3 +1,15 @@
+# gold-bar-tracker
+
+original readme below
+
+a rewrite of the gold-bar-tracker to be multiplatform and do a few more things
+
+## running instructions for devs
+1. setup a venv
+2. install python3-tk 
+3. pip install -r requirements.txt
+4. run the script with python
+
 # Gold-Bar-Tracker
 
 Very Cool Gold Bar Tracker that now tracks Sands and custom stuff also.
