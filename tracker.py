@@ -29,10 +29,11 @@ def resizeImage(img, newWidth, newHeight):
     newPhotoImage = ImageTk.PhotoImage(newImg)
     return newPhotoImage
 
-#load data from json
+# load data from json
 with open(fileSrc('data.json')) as file:
     drop = json.load(file)
 
+# base GUI init
 root = tk.Tk()
 root.title("Drop Tracker")
 root.iconphoto(True, PhotoImage(file=imgSrc("peek.png")))
@@ -47,6 +48,7 @@ def callBack(input):
         return False
 vcmd = root.register(callBack)
 
+# themes
 theme = StringVar(value=drop['settings']['theme'])
 style = ThemedStyle(root)
 style.set_theme(theme.get())
@@ -2292,7 +2294,6 @@ def azuriteDifference(e):
 
     saveData()
 
-
 azuriteImg2 = tk.PhotoImage(file=imgSrc("gohlAzurite.png", raid="gohl"))
 azuriteImg2 = resizeImage(azuriteImg2, 25, 25)
 azuriteImgLabel = ttk.Label(gohlTab, image=azuriteImg2)
@@ -2327,6 +2328,7 @@ settingsThemeLightButton = ttk.Button(settingsTab, textvariable=themeStringDark)
 settingsThemeLightButton.bind('<Button-1>', lambda event: themeSetting("black"))
 settingsThemeLightButton.grid(column=3, columnspan=2, row=6, sticky= tk.NW)
 
+# i have no idea what the fuck this does
 tabControl.select(drop["settings"]["resourceTab"])
 if drop["settings"]["resourceTab"] == ".!notebook.!frame":
     tabControlBar.select(drop["settings"]["goldTab"])
@@ -2335,4 +2337,5 @@ elif drop["settings"]["resourceTab"] == ".!notebook.!frame2":
 else:
     tabControlCustom.select(drop["settings"]["customTab"])
 
+# program runs
 root.mainloop()
