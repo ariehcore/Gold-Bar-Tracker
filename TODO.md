@@ -16,3 +16,6 @@
 [ ] hotkeys
     [ ] defaults
     [ ] customisable
+
+## bug fixe
+[ ] pbaha show actual % and not blue chest %
