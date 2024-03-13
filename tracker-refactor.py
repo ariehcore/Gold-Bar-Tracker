@@ -195,8 +195,6 @@ def hornsDifference(e):
 
     saveData()
 
-# main program logic
-
 # load data from json
 with open(fileSrc('data.json')) as file:
     drop = json.load(file)
@@ -226,7 +224,7 @@ except KeyError:
 else:
     theme = StringVar(value=drop['settings']['theme'])
 style = ThemedStyle(root)
-style.set_theme(theme.get())
+style.set_theme(theme.get() or "arc")
 
 #tab definition
 tabControl = ttk.Notebook(root)
@@ -249,7 +247,7 @@ tabControl.add(settingsTab, text='Settings', image=settingsImg, compound="left")
 tabControl.pack(expand=1, fill="both")
 tabControlBar.pack(expand=1, fill="both")
 
-# gold bar raids definition
+# bar tab 
 pbhlTab = ttk.Frame(tabControlBar)
 gohlTab = ttk.Frame(tabControlBar)
 akashaTab = ttk.Frame(tabControlBar)
@@ -259,7 +257,7 @@ tabControlBar.add(gohlTab, text='GOHL')
 tabControlBar.add(akashaTab, text='Akasha')
 tabControlBar.add(ubahaTab, text='UBHL')
 
-# sand raids
+# sand tab
 revansTab = ttk.Frame(tabControlSand)
 subahaTab = ttk.Frame(tabControlSand)
 hexaTab = ttk.Frame(tabControlSand)
@@ -269,8 +267,25 @@ tabControlSand.add(subahaTab, text='Subaha')
 tabControlSand.add(hexaTab, text='Hexa')
 tabControlSand.add(suluciTab, text='Luci 000')
 
-# counter var def
+# settings tab
+settingsThemeString = StringVar(value="Change Theme")
+settingsThemeStringDark = StringVar(value="Swap to Light Theme")
+settingsThemeStringLight = StringVar(value="Swap to Dark Theme")
 
+settingsThemeTitle = ttk.Label(settingsTab, textvariable=settingsThemeString, justify="left")
+settingsThemeTitle.grid(column=0, columnspan=2, row=5, sticky= tk.NW)
+
+settingsThemeToggleButton = ttk.Button(settingsTab)
+match theme.get(): 
+    case "black":
+        settingsThemeToggleButton.configure(textvariable=settingsThemeStringDark)
+    case "arc":
+        settingsThemeToggleButton.configure(textvariable=settingsThemeStringLight)
+
+settingsThemeToggleButton.bind('<Button-1>', lambda event: themeToggle(theme.get()))
+settingsThemeToggleButton.grid(column=0, columnspan=2, row=6, sticky= tk.NW)
+
+# logic gets moved to classes
 # Tab PBHL
 pbhlraidCount = IntVar(value=drop['pbhl']['raid'])
 noblueCount = IntVar(value=drop['pbhl']['noblue'])
@@ -415,37 +430,17 @@ pbhlCurrentHornEntry.grid(column=3, columnspan=2, row=5)
 pbhlCurrentHornEntry.insert(0, drop['pbhl']['hornafter'])
 pbhlCurrentHornEntry.bind("<KeyRelease>", hornsDifference)
 
-# settings tab
-settingsThemeString = StringVar(value="Change Theme")
-settingsThemeStringDark = StringVar(value="Swap to Light Theme")
-settingsThemeStringLight = StringVar(value="Swap to Dark Theme")
+# --- above logic gets moved to classes
 
-settingsThemeTitle = ttk.Label(settingsTab, textvariable=settingsThemeString, justify="left")
-settingsThemeTitle.grid(column=0, columnspan=2, row=5, sticky= tk.NW)
-
-settingsThemeToggleButton = ttk.Button(settingsTab)
-if theme.get() == "black":
-    settingsThemeToggleButton.configure(textvariable=settingsThemeStringDark)
-elif theme.get() == "arc":
-    settingsThemeToggleButton.configure(textvariable=settingsThemeStringLight)
-settingsThemeToggleButton.bind('<Button-1>', lambda event: themeToggle(theme.get()))
-settingsThemeToggleButton.grid(column=0, columnspan=2, row=6, sticky= tk.NW)
-
-# i have no idea what the fuck this does
-tabControl.select(drop["settings"]["resourceTab"])
 match drop["settings"]["resourceTab"]: 
     case ".!notebook.!frame":
         tabControlBar.select(drop["settings"]["goldTab"])
     case ".!notebook.!frame2":
-        tabControlSettings.select(drop["settings"]["sandTab"])
+        tabControlSand.select(drop["settings"]["sandTab"])
     case ".!notebook.!frame3":
-        tabControlSettings.select(drop["settings"]["settingsTab"])
+        tabControlSettings.select()
     case _:
         tabControlBar.select(drop["settings"]["goldTab"])
-# if drop["settings"]["resourceTab"] == ".!notebook.!frame":
-#     tabControlBar.select(drop["settings"]["goldTab"])
-# elif drop["settings"]["resourceTab"] == ".!notebook.!frame2":
-#     tabControlSettings.select(drop["settings"]["settingsTab"])
 
 # program runs
 root.mainloop()

@@ -5,6 +5,7 @@ env/*
 build/*
 dist/*
 *.spec
+__pycache__/*
 
 # Persistent undo (vim)
 [._]*.un~

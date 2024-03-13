@@ -1,14 +1,14 @@
 {
     "settings": {
-        "resourceTab": ".!notebook.!frame",
+        "resourceTab": ".!notebook.!frame3",
         "goldTab": ".!notebook.!frame.!notebook.!frame",
-        "sandTab": ".!notebook.!frame.!notebook.!frame2",
-        "settingsTab": ".!notebook.!frame.!notebook.!frame3",
-        "theme": "arc"
+        "sandTab": ".!notebook.!frame2.!notebook.!frame",
+        "settingsTab": "",
+        "theme": "black"
     },
     "pbhl": {
-        "raid": 0,
-        "noblue": 0,
+        "raid": 1,
+        "noblue": 1,
         "coronaring": 0,
         "lineagering": 0,
         "intricacyring": 0,
