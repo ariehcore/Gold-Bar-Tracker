@@ -1,13 +1,13 @@
 # application imports
 from src.helpers import *
-from src.models import *
+from src.models.base.Raid import Raid
+from src.models.base.Drop import Drop
 
 # imports
 import json
 import tkinter as tk
 from tkinter import IntVar, StringVar, PhotoImage, ttk
 from ttkthemes import ThemedStyle
-
 
 # debug imports?
 from tkinter import messagebox
@@ -33,7 +33,7 @@ def saveData():
         'hornbefore':pbhlHornLastBarEntry.get(),
         'hornafter':pbhlCurrentHornEntry.get()
     }
-    with open(fileSrc('data.json'),'w') as file:
+    with open('data.json', 'w') as file:
         json.dump(drop,file, indent=4)
 
 #pbhl left mouse button
@@ -196,7 +196,7 @@ def hornsDifference(e):
     saveData()
 
 # load data from json
-with open(fileSrc('data.json')) as file:
+with open('data.json') as file:
     drop = json.load(file)
 
 # base GUI init
@@ -286,6 +286,20 @@ settingsThemeToggleButton.bind('<Button-1>', lambda event: themeToggle(theme.get
 settingsThemeToggleButton.grid(column=0, columnspan=2, row=6, sticky= tk.NW)
 
 # logic gets moved to classes
+pbhlRaid = Raid("pbhl")
+pbhlRaid.image = imgSrc("pbhlCount.png", raid="pbhl")
+pbhlRaid.drops = dict(
+    noBlueChest = Drop("NoBlueChest", imgSrc("pbhlNobluechest.png", raid="pbhl")),
+    blueChest = Drop("BlueChest", imgSrc("pbhlNobluechest.png", raid="pbhl")),
+    coronationRing = Drop("CoronationRing", imgSrc("pbhlNobluechest.png", raid="pbhl")),
+    lineageRing = Drop("LineageRing", imgSrc("pbhlNobluechest.png", raid="pbhl")),
+    intricacyRing = Drop("IntricacyRing", imgSrc("pbhlNobluechest.png", raid="pbhl")),
+    horn = Drop('Horn', imgSrc("pbhlNobluechest.png", raid="pbhl")),
+    goldBar = Drop("GoldBar", imgSrc("pbhlNobluechest.png", raid="pbhl"))
+)
+
+print(pbhlRaid.drops.get('noBlueChest').image)
+
 # Tab PBHL
 pbhlraidCount = IntVar(value=drop['pbhl']['raid'])
 noblueCount = IntVar(value=drop['pbhl']['noblue'])

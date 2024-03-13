@@ -8,29 +8,27 @@ class Raid():
     def drops(self):
         return self._drops
     
+    @drops.setter
+    def drops(self, drops):
+        self._drops = drops
+    
     @property
     def image(self):
         return self._image
+    
+    @image.setter
+    def image(self, image):
+        self._image = image
     
     @property
     def totalCount(self):
         return self._totalCount
     
-    @property
-    def blueCount(self):
-        return self._blueCount
-
-    # array of Drops
-    def setDrops(self, drops):
-        self._drops = drops
-    
-    def incrementCount(self):
-        self.totalCount += 1
-
-    def decrementCount(self):
-        self.totalCount -= 1
+    @totalCount.setter
+    def totalCount(self, count):
+        self._totalCount = count
 
     def __init__(self, name):
-        self.name = name
-        self.totalCount = 0
-        self.blueCount = 0
+        self._name = name
+        self._totalCount = 0
+        self._blueCount = 0

@@ -20,15 +20,9 @@ class Drop():
     def afterCount(self):
         return self._afterCount
 
-    def setImage(self, image):
-        self.image = image
-
-    def incrementCount(countType):
-        countType += 1
-
-    def decrementCount(countType):
-        countType -= 1
-
-    def __init__(self, dropType):
-        self.dropType = dropType
-        self.beforeCount, self.afterCount, self.currentCount = 0
+    def __init__(self, dropType, image):
+        self._dropType = dropType
+        self._image = image
+        self._beforeCount = 0 
+        self._afterCount = 0 
+        self._currentCount = 0
