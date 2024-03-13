@@ -1,108 +1,16 @@
+# application imports
+from src.helpers import *
+from src.models import *
+
+# imports
 import json
-import os
-import sys
 import tkinter as tk
-from PIL import Image, ImageTk
 from tkinter import IntVar, StringVar, PhotoImage, ttk
-from tkinter import messagebox
 from ttkthemes import ThemedStyle
 
-def imgSrc(img, raid: str = "") -> str:
-    if getattr(sys, 'frozen', False):
-        filepath = os.path.dirname(sys.executable)
-    elif __file__:
-        filepath, filename = os.path.split(os.path.realpath(__file__))
 
-    return os.path.join(filepath, "img", img) if raid == "" else os.path.join(filepath, "img", raid, img)
-
-def fileSrc(file):
-    if getattr(sys, 'frozen', False):
-        filepath = os.path.dirname(sys.executable)
-    elif __file__:
-        filepath, filename = os.path.split(os.path.realpath(__file__))
-    return os.path.join(filepath,file)
-
-def resizeImage(img, newWidth, newHeight):
-    pilImage = ImageTk.getimage(img).convert("RGBA")
-    oldWidth, oldHeight = pilImage.size
-    newImg = pilImage.resize((newWidth, newHeight), Image.LANCZOS)
-    newPhotoImage = ImageTk.PhotoImage(newImg)
-    return newPhotoImage
-
-# load data from json
-with open(fileSrc('data.json')) as file:
-    drop = json.load(file)
-
-# base GUI init
-root = tk.Tk()
-root.title("Drop Tracker")
-root.iconphoto(True, PhotoImage(file=imgSrc("peek.png")))
-root.attributes('-topmost', True)
-
-def callBack(input):
-    if input.isdigit():
-        return True
-    elif input == "":
-        return True
-    else:
-        return False
-vcmd = root.register(callBack)
-
-# themes
-theme = StringVar(value=drop['settings']['theme'])
-style = ThemedStyle(root)
-style.set_theme(theme.get())
-
-#tab definition
-tabControl = ttk.Notebook(root)
-
-barTab = ttk.Frame(tabControl)
-settingsTab = ttk.Frame(tabControl)
-
-tabControlBar = ttk.Notebook(barTab)
-tabControlSettings = ttk.Notebook(settingsTab)
-
-pbhlTab = ttk.Frame(tabControlBar)
-
-tabControlBar.add(pbhlTab, text='PBHL')
-
-barImg = ImageTk.PhotoImage((Image.open(imgSrc("goldbar.png"))).resize((20,20),Image.LANCZOS))
-
-tabControl.add(barTab, text="Gold Bar", image=barImg, compound="left")
-tabControl.add(settingsTab, text='Settings', image=barImg, compound="left")
-tabControl.pack(expand=1, fill="both")
-tabControlBar.pack(expand=1, fill="both")
-
-# counter var def
-
-# Tab PBHL
-pbhlraidCount = IntVar(value=drop['pbhl']['raid'])
-noblueCount = IntVar(value=drop['pbhl']['noblue'])
-pbhlcoronaringCount = IntVar(value=drop['pbhl']['coronaring'])
-pbhllineageringCount = IntVar(value=drop['pbhl']['lineagering'])
-pbhlintricacyringCount = IntVar(value=drop['pbhl']['intricacyring'])
-pbhlgoldbarCount = IntVar(value=drop['pbhl']['goldbar'])
-pbhlblueCount = IntVar(value=pbhlraidCount.get()-noblueCount.get())
-pbhlbluePercent = StringVar(value="Dokkan")
-pbhlblueText = StringVar(value="Total: " + str(pbhlblueCount.get()) + "\n" + "Drop Rate: " + str(pbhlbluePercent.get()))
-
-# PBHL
-if pbhlblueCount.get() == 0:
-    nobluePercentage = StringVar(value="0.0%")
-    pbhlcoronaringPercentage = StringVar(value="0.0%")
-    pbhllineageringPercentage = StringVar(value="0.0%")
-    pbhlintricacyringPercentage = StringVar(value="0.0%")
-    pbhlgoldbarPercentage = StringVar(value="0.0%")
-    pbhlbluePercent = StringVar(value="0.0%")
-else:
-    nobluePercentage = StringVar(value=str(round(noblueCount.get()/pbhlblueCount.get()*100,2)) + "%")
-    pbhlcoronaringPercentage = StringVar(value=str(round(pbhlcoronaringCount.get()/pbhlblueCount.get()*100,2)) + "%")
-    pbhllineageringPercentage = StringVar(value=str(round(pbhllineageringCount.get()/pbhlblueCount.get()*100,2)) + "%")
-    pbhlintricacyringPercentage = StringVar(value=str(round(pbhlintricacyringCount.get()/pbhlblueCount.get()*100,2)) + "%")
-    pbhlgoldbarPercentage = StringVar(value=str(round(pbhlgoldbarCount.get()/pbhlblueCount.get()*100,2)) + "%")
-    pbhlbluePercent = StringVar(value=str(round(pbhlblueCount.get()/pbhlraidCount.get()*100,2)) + "%")
-
-pbhlblueText.set(value="Total: " + str(pbhlblueCount.get()) + "\n" + "Drop Rate: " + str(pbhlbluePercent.get()))
+# debug imports?
+from tkinter import messagebox
 
 #save data to json
 def saveData():
@@ -111,6 +19,7 @@ def saveData():
     drop['settings'] = {
         'resourceTab':  tabControl.select(),
         'goldTab':  tabControlBar.select(),
+        'sandTab':  tabControlSand.select(),
         'settingsTab':  tabControlSettings.select(),
         'theme': theme.get()
     }
@@ -274,6 +183,123 @@ def themeSetting(themeColor):
     style.set_theme(theme.get())
     saveData()
 
+def hornsDifference(e):
+    if pbhlHornLastBarEntry.get() == "" and pbhlCurrentHornEntry.get() == "":
+        pbhlHornsSinceLabel.set("Horns since:" + "\n" + "0")
+    elif pbhlHornLastBarEntry.get() == "":
+        pbhlHornsSinceLabel.set("Horns since:" + "\n" + str(abs(int(pbhlCurrentHornEntry.get()))))
+    elif pbhlCurrentHornEntry.get() == "":
+        pbhlHornsSinceLabel.set("Horns since:" + "\n" + str(abs(int(pbhlHornLastBarEntry.get()))))
+    else:
+        pbhlHornsSinceLabel.set("Horns since:" + "\n" + str(abs(int(pbhlHornLastBarEntry.get()) - int(pbhlCurrentHornEntry.get()))))
+
+    saveData()
+
+# main program logic
+
+# load data from json
+with open(fileSrc('data.json')) as file:
+    drop = json.load(file)
+
+# base GUI init
+root = tk.Tk()
+root.title("Drop Tracker")
+root.iconphoto(True, PhotoImage(file=imgSrc("peek.png")))
+root.attributes('-topmost', True)
+
+def callBack(input):
+    if input.isdigit():
+        return True
+    elif input == "":
+        return True
+    else:
+        return False
+vcmd = root.register(callBack)
+
+# theme init
+# if user is using old data.json, default is now dark theme 
+try:
+    drop['settings']['theme']
+except KeyError:
+    drop['settings']['theme'] = 'black';
+    theme = StringVar(value=drop['settings']['theme'])
+else:
+    theme = StringVar(value=drop['settings']['theme'])
+style = ThemedStyle(root)
+style.set_theme(theme.get())
+
+#tab definition
+tabControl = ttk.Notebook(root)
+
+barTab = ttk.Frame(tabControl)
+sandTab = ttk.Frame(tabControl)
+settingsTab = ttk.Frame(tabControl)
+
+tabControlBar = ttk.Notebook(barTab)
+tabControlSand = ttk.Notebook(sandTab)
+tabControlSettings = ttk.Notebook(settingsTab)
+
+barImg = ImageTk.PhotoImage((Image.open(imgSrc("goldbar.png"))).resize((20,20),Image.LANCZOS))
+sandImg = ImageTk.PhotoImage((Image.open(imgSrc("eternitysand.png"))).resize((20,20),Image.LANCZOS))
+settingsImg = ImageTk.PhotoImage((Image.open(imgSrc("settingscog.png"))).resize((20,20),Image.LANCZOS))
+
+tabControl.add(barTab, text="Bar Raids", image=barImg, compound="left")
+tabControl.add(sandTab, text="Sand Raids", image=sandImg, compound="left")
+tabControl.add(settingsTab, text='Settings', image=settingsImg, compound="left")
+tabControl.pack(expand=1, fill="both")
+tabControlBar.pack(expand=1, fill="both")
+
+# gold bar raids definition
+pbhlTab = ttk.Frame(tabControlBar)
+gohlTab = ttk.Frame(tabControlBar)
+akashaTab = ttk.Frame(tabControlBar)
+ubahaTab = ttk.Frame(tabControlBar)
+tabControlBar.add(pbhlTab, text='PBHL')
+tabControlBar.add(gohlTab, text='GOHL')
+tabControlBar.add(akashaTab, text='Akasha')
+tabControlBar.add(ubahaTab, text='UBHL')
+
+# sand raids
+revansTab = ttk.Frame(tabControlSand)
+subahaTab = ttk.Frame(tabControlSand)
+hexaTab = ttk.Frame(tabControlSand)
+suluciTab = ttk.Frame(tabControlSand)
+tabControlSand.add(revansTab, text='Revans')
+tabControlSand.add(subahaTab, text='Subaha')
+tabControlSand.add(hexaTab, text='Hexa')
+tabControlSand.add(suluciTab, text='Luci 000')
+
+# counter var def
+
+# Tab PBHL
+pbhlraidCount = IntVar(value=drop['pbhl']['raid'])
+noblueCount = IntVar(value=drop['pbhl']['noblue'])
+pbhlcoronaringCount = IntVar(value=drop['pbhl']['coronaring'])
+pbhllineageringCount = IntVar(value=drop['pbhl']['lineagering'])
+pbhlintricacyringCount = IntVar(value=drop['pbhl']['intricacyring'])
+pbhlgoldbarCount = IntVar(value=drop['pbhl']['goldbar'])
+pbhlblueCount = IntVar(value=pbhlraidCount.get()-noblueCount.get())
+pbhlbluePercent = StringVar(value="Dokkan")
+pbhlblueText = StringVar(value="Total: " + str(pbhlblueCount.get()) + "\n" + "Drop Rate: " + str(pbhlbluePercent.get()))
+
+# PBHL
+if pbhlblueCount.get() == 0:
+    nobluePercentage = StringVar(value="0.0%")
+    pbhlcoronaringPercentage = StringVar(value="0.0%")
+    pbhllineageringPercentage = StringVar(value="0.0%")
+    pbhlintricacyringPercentage = StringVar(value="0.0%")
+    pbhlgoldbarPercentage = StringVar(value="0.0%")
+    pbhlbluePercent = StringVar(value="0.0%")
+else:
+    nobluePercentage = StringVar(value=str(round(noblueCount.get()/pbhlblueCount.get()*100,2)) + "%")
+    pbhlcoronaringPercentage = StringVar(value=str(round(pbhlcoronaringCount.get()/pbhlblueCount.get()*100,2)) + "%")
+    pbhllineageringPercentage = StringVar(value=str(round(pbhllineageringCount.get()/pbhlblueCount.get()*100,2)) + "%")
+    pbhlintricacyringPercentage = StringVar(value=str(round(pbhlintricacyringCount.get()/pbhlblueCount.get()*100,2)) + "%")
+    pbhlgoldbarPercentage = StringVar(value=str(round(pbhlgoldbarCount.get()/pbhlblueCount.get()*100,2)) + "%")
+    pbhlbluePercent = StringVar(value=str(round(pbhlblueCount.get()/pbhlraidCount.get()*100,2)) + "%")
+
+pbhlblueText.set(value="Total: " + str(pbhlblueCount.get()) + "\n" + "Drop Rate: " + str(pbhlbluePercent.get()))
+
 # GUI Layout / render
 
 # total pbhl raids
@@ -370,18 +396,6 @@ elif drop['pbhl']['hornafter'] == "":
 else:
     pbhlHornsSinceLabel = StringVar(value="Horns since:" + "\n" + str(abs(int(drop['pbhl']['hornbefore'])-int(drop['pbhl']['hornafter']))))
 
-def hornsDifference(e):
-    if pbhlHornLastBarEntry.get() == "" and pbhlCurrentHornEntry.get() == "":
-        pbhlHornsSinceLabel.set("Horns since:" + "\n" + "0")
-    elif pbhlHornLastBarEntry.get() == "":
-        pbhlHornsSinceLabel.set("Horns since:" + "\n" + str(abs(int(pbhlCurrentHornEntry.get()))))
-    elif pbhlCurrentHornEntry.get() == "":
-        pbhlHornsSinceLabel.set("Horns since:" + "\n" + str(abs(int(pbhlHornLastBarEntry.get()))))
-    else:
-        pbhlHornsSinceLabel.set("Horns since:" + "\n" + str(abs(int(pbhlHornLastBarEntry.get()) - int(pbhlCurrentHornEntry.get()))))
-
-    saveData()
-
 # Horn Count
 pbhlhornImg = tk.PhotoImage(file=imgSrc("pbhlhorn.png", raid="pbhl"))
 pbhlhornImg = resizeImage(pbhlhornImg, 25, 25)
@@ -419,10 +433,19 @@ settingsThemeToggleButton.grid(column=0, columnspan=2, row=6, sticky= tk.NW)
 
 # i have no idea what the fuck this does
 tabControl.select(drop["settings"]["resourceTab"])
-if drop["settings"]["resourceTab"] == ".!notebook.!frame":
-    tabControlBar.select(drop["settings"]["goldTab"])
-elif drop["settings"]["resourceTab"] == ".!notebook.!frame2":
-    tabControlBar.select(drop["settings"]["settingsTab"])
+match drop["settings"]["resourceTab"]: 
+    case ".!notebook.!frame":
+        tabControlBar.select(drop["settings"]["goldTab"])
+    case ".!notebook.!frame2":
+        tabControlSettings.select(drop["settings"]["sandTab"])
+    case ".!notebook.!frame3":
+        tabControlSettings.select(drop["settings"]["settingsTab"])
+    case _:
+        tabControlBar.select(drop["settings"]["goldTab"])
+# if drop["settings"]["resourceTab"] == ".!notebook.!frame":
+#     tabControlBar.select(drop["settings"]["goldTab"])
+# elif drop["settings"]["resourceTab"] == ".!notebook.!frame2":
+#     tabControlSettings.select(drop["settings"]["settingsTab"])
 
 # program runs
 root.mainloop()
