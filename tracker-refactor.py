@@ -298,8 +298,6 @@ pbhlRaid.drops = dict(
     goldBar = Drop("GoldBar", imgSrc("pbhlNobluechest.png", raid="pbhl"))
 )
 
-print(pbhlRaid.drops.get('noBlueChest').image)
-
 # Tab PBHL
 pbhlraidCount = IntVar(value=drop['pbhl']['raid'])
 noblueCount = IntVar(value=drop['pbhl']['noblue'])
